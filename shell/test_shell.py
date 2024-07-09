@@ -3,7 +3,7 @@ import websockets
 import json
 
 async def test_websocket():
-    uri = "ws://10.30.1.221:8010/ws/shell/"
+    uri = "ws://10.30.1.221:8020/ws/shell/"
     async with websockets.connect(uri) as websocket:
         # Send initial data to start the command
         message = json.dumps({
