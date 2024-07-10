@@ -1,0 +1,7 @@
+version: '3.9'
+
+services:
+  backend-ws:
+    image: quay.tiplab.local/orca/be:dev-ws
+    ports:
+      - 8002:8002
