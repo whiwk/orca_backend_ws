@@ -3,5 +3,8 @@ version: '3.9'
 services:
   backend-ws:
     image: quay.tiplab.local/orca/be:dev-ws
+    cap_add:
+      - CAP_NET_RAW
+      - CAP_NET_ADMIN
     ports:
       - 8002:8002
