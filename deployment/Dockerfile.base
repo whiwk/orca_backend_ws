@@ -1,0 +1,13 @@
+FROM quay.tiplab.local/orca/be:base-ws
+
+LABEL maintainer="gintingari73@gmail.com"
+
+# set and install requirement packages
+COPY . /app
+WORKDIR /app
+ENV TZ=Asia/Jakarta
+RUN pip install --no-cache-dir -r /app/requirements.txt
+
+#running service
+EXPOSE 8002
+CMD ["daphne", "-b", "0.0.0.0", "-p", "8002", "orca_backend_ws.asgi:application"]
