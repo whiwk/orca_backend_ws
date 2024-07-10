@@ -22,6 +22,20 @@ class ShellConsumer(AsyncWebsocketConsumer):
             await self.send(text_data=json.dumps({'error': 'Invalid pod name, namespace, or command'}))
             return
 
+        if command == 'stop':
+            if self.command_process:
+                # Find the PID of the running process inside the pod and kill it
+                find_pid_command = f"kubectl exec -it {pod_name} -n {namespace} -- pkill -f '{self.current_command}'"
+                subprocess.run(find_pid_command, shell=True)
+                await self.send(text_data=json.dumps({'message': 'Command stopped'}))
+            return
+
+        self.current_command = command
+
+        # Check if the command is 'ping' and if '-c' is missing
+        if command.startswith('ping') and '-c' not in command:
+            command += ' -c 4'
+
         command_list = ['kubectl', 'exec', '-it', pod_name, '-n', namespace, '--'] + command.split()
 
         self.command_process = await asyncio.create_subprocess_exec(

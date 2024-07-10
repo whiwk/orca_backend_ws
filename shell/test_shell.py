@@ -7,7 +7,7 @@ async def test_websocket():
     async with websockets.connect(uri) as websocket:
         # Send initial data to start the command
         message = json.dumps({
-            'pod_name': 'oai-nr-ue-level1-user3-6d65889758-gt4hn',  # Replace with your actual pod name
+            'pod_name': 'oai-nr-ue-level1-user3-7ddf4d8466-ttz2s',  # Replace with your actual pod name
             'namespace': 'user3',  # Replace with your actual namespace
             'command': 'curl google.com'  # User-defined command
         })
