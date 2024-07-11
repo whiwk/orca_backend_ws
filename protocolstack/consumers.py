@@ -23,8 +23,8 @@ class ProtocolStackConsumer(AsyncWebsocketConsumer):
 
         # Command to capture SCTP packets and parse them with tshark
         sniff_command = [
-            'kubectl', 'exec', '-it', pod_name, '-n', namespace, '--',
-            'sh', '-c', 'tcpdump -i f1 -U -w - sctp | tshark -r - -Y "sctp" -T json -e sctp.srcport -e sctp.dstport -e sctp.verification_tag -e sctp.assoc_index -e sctp.port -e sctp.checksum -e sctp.checksum.status -e sctp.chunk_type -e sctp.chunk_flags -e sctp.chunk_length -e sctp.parameter_type -e sctp.parameter_length -e sctp.parameter_heartbeat_information'
+            'kubectl', 'exec', '-it', pod_name, '-n', namespace, '-c', 'tcpdump', '--',
+            'sh', '-c', 'tshark -i f1 -Y "sctp" -T json -e sctp.srcport -e sctp.dstport -e sctp.verification_tag -e sctp.assoc_index -e sctp.port -e sctp.checksum -e sctp.checksum.status -e sctp.chunk_type -e sctp.chunk_flags -e sctp.chunk_length -e sctp.parameter_type -e sctp.parameter_length -e sctp.parameter_heartbeat_information'
         ]
 
         self.sniffing_process = await asyncio.create_subprocess_exec(

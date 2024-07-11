@@ -1,4 +1,4 @@
-FROM quay.tiplab.local/orca/be:base-ws
+FROM quay.tiplab.local/orca/ws:base
 
 LABEL maintainer="gintingari73@gmail.com"
 
