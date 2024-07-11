@@ -39,14 +39,14 @@ class SniffConsumer(AsyncWebsocketConsumer):
 
         # Command to output tcpdump results directly
         sniff_command = [
-            'kubectl', 'exec', '-it', pod_name, '-n', namespace, '--',
-            'tcpdump', '-i', 'f1', 'sctp or udp port 2152'
+            'kubectl', 'exec', '-it', pod_name, '-n', namespace, '-c', 'tcpdump', '--',
+            'tshark', '-i', 'f1', 'sctp or udp port 2152'
         ]
 
         # Command to save tcpdump results to a pcap file
         pcap_command = [
-            'kubectl', 'exec', '-it', pod_name, '-n', namespace, '--',
-            'tcpdump', '-i', 'f1', '-w', pcap_filepath, 'sctp or udp port 2152'
+            'kubectl', 'exec', '-it', pod_name, '-n', namespace, '-c', 'tcpdump', '--',
+            'tshark', '-i', 'f1', '-w', pcap_filepath, 'sctp or udp port 2152'
         ]
 
         # Start the sniffing process to output results directly
