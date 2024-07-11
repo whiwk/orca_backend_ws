@@ -8,3 +8,4 @@ services:
       - CAP_NET_ADMIN
     ports:
       - 8002:8002
+    restart: always
