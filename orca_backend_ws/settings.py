@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'monitoring',
     'shell',
     'sniff',
+    'protocolstack',
 ]
 
 ASGI_APPLICATION = 'orca_backend_ws.asgi.application'
@@ -82,8 +83,8 @@ WSGI_APPLICATION = 'orca_backend_ws.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': env('DATABASE_ENGINE'),
-        'NAME': BASE_DIR / env('DATABASE_NAME'),
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / "db.sqlite3",
     }
 }
 
