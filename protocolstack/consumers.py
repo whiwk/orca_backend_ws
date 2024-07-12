@@ -1,6 +1,5 @@
 import json
 import asyncio
-from datetime import datetime
 from channels.generic.websocket import AsyncWebsocketConsumer
 
 class ProtocolStackConsumer(AsyncWebsocketConsumer):
@@ -34,10 +33,10 @@ class ProtocolStackConsumer(AsyncWebsocketConsumer):
         )
 
         while True:
-            chunk = await self.sniffing_process.stdout.readline()  # Read line by line
+            chunk = await self.sniffing_process.stdout.readline()
             if chunk:
-                # Decode and format the chunk
                 formatted_output = chunk.decode('utf-8').strip()
+                # Here, just send the raw line as received
                 await self.send(text_data=json.dumps({'data': formatted_output}))
             else:
                 break
