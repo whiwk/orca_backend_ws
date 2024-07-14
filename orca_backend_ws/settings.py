@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'shell',
     'sniff',
     'protocolstack',
+    'logs',
 ]
 
 ASGI_APPLICATION = 'orca_backend_ws.asgi.application'

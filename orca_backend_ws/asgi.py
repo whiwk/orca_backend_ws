@@ -7,6 +7,7 @@ import shell.routing
 import monitoring.routing
 import sniff.routing
 import protocolstack.routing
+import logs.routing
 
 # Set the default Django settings module for the 'asgi' application
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'orca_backend_ws.settings')
@@ -21,7 +22,8 @@ application = ProtocolTypeRouter({
             shell.routing.websocket_urlpatterns +
             monitoring.routing.websocket_urlpatterns +
             sniff.routing.websocket_urlpatterns +
-            protocolstack.routing.websocket_urlpatterns
+            protocolstack.routing.websocket_urlpatterns +
+            logs.routing.websocket_urlpatterns
         )
     ),
 })
