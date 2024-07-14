@@ -7,7 +7,7 @@ async def test_websocket():
     async with websockets.connect(uri) as websocket:
         # Send initial data to start the tcpdump command
         message = json.dumps({
-            'pod_name': 'oai-cu-level1-user1-cb4b4dcb6-2ftbx',  # Replace with your actual pod name
+            'pod_name': 'oai-du-level1-user1-865645d8f4-xjg8r',  # Replace with your actual pod name
             'namespace': 'user1'  # Replace with your actual namespace
         })
         await websocket.send(message)

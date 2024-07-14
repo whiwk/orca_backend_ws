@@ -26,6 +26,7 @@ class SniffConsumer(AsyncWebsocketConsumer):
         data = json.loads(text_data)
         pod_name = data.get('pod_name')
         namespace_name = data.get('namespace')
+        interface = data.get('interface')  # Get the interface from user input
 
         if not pod_name or not namespace_name:
             await self.send(text_data=json.dumps({'error': 'Invalid pod name or namespace'}))
@@ -33,20 +34,63 @@ class SniffConsumer(AsyncWebsocketConsumer):
 
         component = '-'.join(pod_name.split('-')[1:3])
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        pcap_filename = f"{namespace_name}_{component}_{timestamp}.pcap"
+
+        # Include the interface in the pcap filename
+        if interface:
+            pcap_filename = f"{namespace_name}_{component}_{interface}_{timestamp}.pcap"
+        else:
+            pcap_filename = f"{namespace_name}_{component}_{timestamp}.pcap"
+
         pcap_directory = 'home'
         os.makedirs(pcap_directory, exist_ok=True)
         self.pcap_filepath = f"{pcap_directory}/{pcap_filename}"
 
-        sniff_command = [
-            'kubectl', 'exec', '-it', pod_name, '-n', namespace_name, '-c', 'tcpdump', '--',
-            'tshark', '-i', 'f1', 'sctp or udp port 2152'
-        ]
-
-        pcap_command = [
-            'kubectl', 'exec', '-it', pod_name, '-n', namespace_name, '-c', 'tcpdump', '--',
-            'tshark', '-i', 'f1', '-w', self.pcap_filepath, 'sctp or udp port 2152'
-        ]
+        if 'oai-cu-level1' in pod_name:
+            if interface not in ['f1', 'n2', 'n3']:
+                await self.send(text_data=json.dumps({'error': 'Invalid interface for CU component'}))
+                return
+            sniff_command = [
+                'kubectl', 'exec', '-it', pod_name, '-n', namespace_name, '-c', 'tcpdump', '--',
+                'tshark', '-i', interface, 'sctp or udp port 2152'
+            ]
+            pcap_command = [
+                'kubectl', 'exec', '-it', pod_name, '-n', namespace_name, '-c', 'tcpdump', '--',
+                'tshark', '-i', interface, '-w', self.pcap_filepath, 'sctp or udp port 2152'
+            ]
+        elif 'oai-du-level1' in pod_name:
+            sniff_command = [
+                'kubectl', 'exec', '-it', pod_name, '-n', namespace_name, '-c', 'tcpdump', '--',
+                'tshark', '-i', 'f1', 'sctp or udp port 2152'
+            ]
+            pcap_command = [
+                'kubectl', 'exec', '-it', pod_name, '-n', namespace_name, '-c', 'tcpdump', '--',
+                'tshark', '-i', 'f1', '-w', self.pcap_filepath, 'sctp or udp port 2152'
+            ]
+        elif 'oai-nr-ue-level1' in pod_name:
+            if interface == 'oaitun':
+                sniff_command = [
+                    'kubectl', 'exec', '-it', pod_name, '-n', namespace_name, '-c', 'tcpdump', '--',
+                    'tshark', '-i', 'oaitun_ue1'
+                ]
+                pcap_command = [
+                    'kubectl', 'exec', '-it', pod_name, '-n', namespace_name, '-c', 'tcpdump', '--',
+                    'tshark', '-i', 'oaitun_ue1', '-w', self.pcap_filepath
+                ]
+            elif interface == 'net1':
+                sniff_command = [
+                    'kubectl', 'exec', '-it', pod_name, '-n', namespace_name, '-c', 'tcpdump', '--',
+                    'tshark', '-i', 'net1', 'sctp or udp port 2152'
+                ]
+                pcap_command = [
+                    'kubectl', 'exec', '-it', pod_name, '-n', namespace_name, '-c', 'tcpdump', '--',
+                    'tshark', '-i', 'net1', '-w', self.pcap_filepath, 'sctp or udp port 2152'
+                ]
+            else:
+                await self.send(text_data=json.dumps({'error': 'Invalid interface for UE component'}))
+                return
+        else:
+            await self.send(text_data=json.dumps({'error': 'Unsupported component type'}))
+            return
 
         self.sniffing_process = await asyncio.create_subprocess_exec(
             *sniff_command,
