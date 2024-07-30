@@ -3,12 +3,12 @@ import websockets
 import json
 
 async def test_websocket():
-    uri = "ws://10.30.1.221:8020/ws/shell/"
+    uri = "ws://10.30.1.221:8002/ws/shell/"
     async with websockets.connect(uri) as websocket:
         # Send initial data to start the command
         message = json.dumps({
-            'pod_name': 'oai-nr-ue-level1-user3-7ddf4d8466-ttz2s',  # Replace with your actual pod name
-            'namespace': 'user3',  # Replace with your actual namespace
+            'pod_name': 'oai-nr-ue-level1-user1-59f86bc6db-gx5fx',  # Replace with your actual pod name
+            'namespace': 'user1',  # Replace with your actual namespace
             'command': 'curl google.com'  # User-defined command
         })
         await websocket.send(message)

@@ -3,7 +3,7 @@ import websockets
 import json
 
 async def test_logs_consumer():
-    uri = "ws://10.30.1.221:8020/ws/logs/"  # Replace with your actual WebSocket URL
+    uri = "ws://10.30.1.221:8002/ws/logs/"  # Replace with your actual WebSocket URL
 
     async with websockets.connect(uri) as websocket:
         print("WebSocket connection established")
