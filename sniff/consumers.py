@@ -51,7 +51,7 @@ class SniffConsumer(AsyncWebsocketConsumer):
                 return
             sniff_command = [
                 'kubectl', 'exec', '-it', pod_name, '-n', namespace_name, '-c', 'tcpdump', '--',
-                'tshark', '-i', interface, 'sctp or udp port 2152'
+                'tshark', '-i', interface, '-f', 'sctp or udp port 2152'
             ]
             pcap_command = [
                 'kubectl', 'exec', '-it', pod_name, '-n', namespace_name, '-c', 'tcpdump', '--',
