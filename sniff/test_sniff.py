@@ -3,12 +3,12 @@ import websockets
 import json
 
 async def test_websocket():
-    uri = "ws://10.30.1.221:8002/ws/sniff/"
+    uri = "ws://10.30.1.221:8010/ws/sniff/"
     async with websockets.connect(uri) as websocket:
         # Send initial data to start the tcpdump command
         message = json.dumps({
-            'pod_name': 'oai-cu-level1-user1-cb4b4dcb6-kdwlj',  # Replace with your actual pod name
-            'namespace': 'user1',  # Replace with your actual namespace
+            'pod_name': 'oai-cu-level1-user11-864bc89c4f-8xjz5',  # Replace with your actual pod name
+            'namespace': 'user11',  # Replace with your actual namespace
             'interface': 'n2'  # Uncomment and replace with actual interface if needed (e.g., 'f1', 'n2', 'n3', 'oaitun', 'net1')
         })
         await websocket.send(message)
