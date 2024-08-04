@@ -11,6 +11,7 @@ class MonitoringConsumer(AsyncWebsocketConsumer):
     async def disconnect(self, close_code):
         if self.monitoring_task:
             self.monitoring_task.cancel()
+            await self.monitoring_task
 
     async def receive(self, text_data):
         data = json.loads(text_data)
@@ -22,12 +23,19 @@ class MonitoringConsumer(AsyncWebsocketConsumer):
             return
 
         # Start the monitoring task
+        if self.monitoring_task:
+            self.monitoring_task.cancel()
+            await self.monitoring_task
+
         self.monitoring_task = asyncio.create_task(self.monitor_logs(pod_name, namespace))
 
     async def monitor_logs(self, pod_name, namespace):
-        while True:
-            try:
-                command_list = ['kubectl', 'exec', '-it', pod_name, '-n', namespace, '--', 'cat', 'nrL1_UE_stats-0.log']
+        process = None
+        try:
+            while True:
+                command_list = ['kubectl', 'exec', pod_name, '-n', namespace, '--', 'cat', 'nrL1_UE_stats-0.log']
+                print(f"Running command: {' '.join(command_list)}")  # Debug: print the command
+
                 process = await asyncio.create_subprocess_exec(
                     *command_list,
                     stdout=asyncio.subprocess.PIPE,
@@ -37,16 +45,54 @@ class MonitoringConsumer(AsyncWebsocketConsumer):
                 while True:
                     line = await process.stdout.readline()
                     if line:
+                        print(f"Received line: {line.decode('utf-8')}")  # Debug: print each line received
                         await self.send(text_data=json.dumps({'monitoring_output': line.decode('utf-8')}))
                     else:
                         break
 
+                    # Check periodically if the task has been cancelled
+                    if self.monitoring_task.cancelled():
+                        break
+
                 await process.wait()
 
-                # Sleep for a short duration before the next read to simulate `watch` behavior
-                await asyncio.sleep(2)
-            except asyncio.CancelledError:
-                # Handle task cancellation
-                if process:
-                    process.kill()
-                break
+                if self.monitoring_task.cancelled():
+                    break
+
+                # Sleep for 5 seconds before the next execution
+                await asyncio.sleep(5)
+
+        except asyncio.CancelledError:
+            if process:
+                process.kill()
+                await process.wait()
+            raise
+        except Exception as e:
+            await self.send(text_data=json.dumps({'error': str(e)}))
+            print(f"Error: {e}")  # Debug: print the error
+        finally:
+            if process and not process.returncode:
+                process.kill()
+                await process.wait()
+
+if __name__ == "__main__":
+    # This is a testing stub to run the consumer directly
+    import sys
+    from channels.testing import WebsocketCommunicator
+    from django.conf import settings
+
+    settings.configure()
+    consumer = MonitoringConsumer()
+
+    async def test_consumer():
+        communicator = WebsocketCommunicator(consumer, "/testws/")
+        connected, subprotocol = await communicator.connect()
+        assert connected
+        await communicator.send_json_to({
+            "pod_name": "test-pod",
+            "namespace": "default"
+        })
+        response = await communicator.receive_json_from()
+        print(response)
+
+    asyncio.run(test_consumer())

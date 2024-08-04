@@ -3,11 +3,11 @@ import websockets
 import json
 
 async def test_websocket():
-    uri = "ws://10.30.1.221:8002/ws/monitoring/"
+    uri = "ws://10.30.1.221:8010/ws/monitoring/"
     async with websockets.connect(uri) as websocket:
         # Send initial data to start the monitoring command
         message = json.dumps({
-            'pod_name': 'oai-nr-ue-level1-user1-59f86bc6db-gx5fx',  # Replace with your actual pod name
+            'pod_name': 'oai-nr-ue-level1-user1-76964dbbd7-x5x9b',  # Replace with your actual pod name
             'namespace': 'user1',  # Replace with your actual namespace
         })
         await websocket.send(message)
