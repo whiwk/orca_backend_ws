@@ -1,8 +1,5 @@
 FROM quay.tiplab.local/orca/ws:base
 
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-
 LABEL maintainer="gintingari73@gmail.com"
 
 # set and install requirement packages

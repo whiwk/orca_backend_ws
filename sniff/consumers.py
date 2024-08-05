@@ -55,35 +55,35 @@ class SniffConsumer(AsyncWebsocketConsumer):
             ]
             pcap_command = [
                 'kubectl', 'exec', '-it', pod_name, '-n', namespace_name, '-c', 'tcpdump', '--',
-                'tshark', '-i', interface, '-w', self.pcap_filepath, 'sctp or udp port 2152'
+                'tshark', '-i', interface, '-w', self.pcap_filepath, '-f', 'sctp or udp port 2152'
             ]
         elif 'oai-du-level1' in pod_name:
             sniff_command = [
                 'kubectl', 'exec', '-it', pod_name, '-n', namespace_name, '-c', 'tcpdump', '--',
-                'tshark', '-i', 'f1', 'sctp or udp port 2152'
+                'tshark', '-i', 'f1', '-f', 'sctp or udp port 2152'
             ]
             pcap_command = [
                 'kubectl', 'exec', '-it', pod_name, '-n', namespace_name, '-c', 'tcpdump', '--',
-                'tshark', '-i', 'f1', '-w', self.pcap_filepath, 'sctp or udp port 2152'
+                'tshark', '-i', 'f1', '-w', self.pcap_filepath, '-f', 'sctp or udp port 2152'
             ]
         elif 'oai-nr-ue-level1' in pod_name:
             if interface == 'oaitun':
                 sniff_command = [
                     'kubectl', 'exec', '-it', pod_name, '-n', namespace_name, '-c', 'tcpdump', '--',
-                    'tshark', '-i', 'oaitun_ue1'
+                    'tshark', '-i', 'oaitun_ue1', '-f'
                 ]
                 pcap_command = [
                     'kubectl', 'exec', '-it', pod_name, '-n', namespace_name, '-c', 'tcpdump', '--',
-                    'tshark', '-i', 'oaitun_ue1', '-w', self.pcap_filepath
+                    'tshark', '-i', 'oaitun_ue1', '-w', '-f', self.pcap_filepath
                 ]
             elif interface == 'net1':
                 sniff_command = [
                     'kubectl', 'exec', '-it', pod_name, '-n', namespace_name, '-c', 'tcpdump', '--',
-                    'tshark', '-i', 'net1', 'sctp or udp port 2152'
+                    'tshark', '-i', 'net1', '-f', 'sctp or udp port 2152'
                 ]
                 pcap_command = [
                     'kubectl', 'exec', '-it', pod_name, '-n', namespace_name, '-c', 'tcpdump', '--',
-                    'tshark', '-i', 'net1', '-w', self.pcap_filepath, 'sctp or udp port 2152'
+                    'tshark', '-i', 'net1', '-w', self.pcap_filepath, '-f', 'sctp or udp port 2152'
                 ]
             else:
                 await self.send(text_data=json.dumps({'error': 'Invalid interface for UE component'}))
